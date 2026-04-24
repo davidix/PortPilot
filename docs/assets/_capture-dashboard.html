@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PortPilot dashboard capture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink-950: #070708;
+        --ink-900: #0c0c0e;
+        --ink-800: #131316;
+        --grid: rgba(255, 255, 255, 0.035);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 15px;
+        color: #f4f4f5;
+        background: var(--ink-950);
+        background-image:
+          radial-gradient(900px 540px at 12% -10%, rgba(56, 189, 248, 0.1), transparent 60%),
+          radial-gradient(700px 480px at 92% -10%, rgba(99, 102, 241, 0.1), transparent 60%),
+          radial-gradient(800px 520px at 50% 110%, rgba(16, 185, 129, 0.06), transparent 60%),
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+        background-size: auto, auto, auto, 56px 56px, 56px 56px;
+        background-position: 0 0, 0 0, 0 0, -1px -1px, -1px -1px;
+        background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 1152px;
+        margin: 0 auto;
+        padding: 40px 32px 48px;
+      }
+      .header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(19, 19, 22, 0.6);
+        padding: 6px 12px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(186, 230, 253, 0.9);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 0 0 1px rgba(255, 255, 255, 0.04);
+        margin-bottom: 12px;
+      }
+      .eyebrow .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #7dd3fc;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 48px;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        color: #fff;
+        line-height: 1.05;
+      }
+      .lede {
+        margin: 0;
+        max-width: 36rem;
+        font-size: 14px;
+        line-height: 1.65;
+        color: #a1a1aa;
+      }
+      .header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+      .agent-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: rgba(12, 12, 14, 0.6);
+        padding: 8px 12px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        background: rgba(52, 211, 153, 0.1);
+        color: #bbf7d0;
+        box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.3);
+      }
+      .status .sdot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #6ee7b7;
+      }
+      .agent-host {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: #a1a1aa;
+      }
+      .btn-refresh {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        background: linear-gradient(to bottom, #38bdf8, #0ea5e9);
+        padding: 8px 8px 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #0f172a;
+        box-shadow: 0 18px 40px -18px rgba(56, 189, 248, 0.7);
+      }
+      .btn-refresh .ico {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(15, 23, 42, 0.15);
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+      .stat {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(12, 12, 14, 0.7);
+        padding: 16px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 0 0 1px rgba(255, 255, 255, 0.04);
+      }
+      .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .stat-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #71717a;
+      }
+      .stat-val {
+        margin-top: 8px;
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+      .stat-sub {
+        font-size: 12px;
+        color: #71717a;
+        margin-left: 8px;
+        font-weight: 400;
+      }
+      .filters {
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(12, 12, 14, 0.6);
+        padding: 6px;
+        margin-bottom: 28px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+      }
+      .filters-inner {
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: rgba(19, 19, 22, 0.4);
+        padding: 20px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+      }
+      .field label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #71717a;
+        margin-bottom: 6px;
+      }
+      .search {
+        grid-column: span 2;
+        position: relative;
+      }
+      .search input {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: rgba(19, 19, 22, 0.7);
+        padding: 10px 14px 10px 36px;
+        font: inherit;
+        font-size: 14px;
+        color: #fafafa;
+      }
+      .search::before {
+        content: "⌕";
+        position: absolute;
+        left: 12px;
+        top: 34px;
+        color: #71717a;
+        font-size: 14px;
+      }
+      .seg {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        padding: 4px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: rgba(19, 19, 22, 0.7);
+      }
+      .seg button {
+        border: 0;
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      }
+      .seg button.off {
+        background: transparent;
+        color: #a1a1aa;
+        box-shadow: none;
+      }
+      select {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: rgba(19, 19, 22, 0.7);
+        padding: 10px 12px;
+        font: inherit;
+        font-size: 14px;
+        color: #fafafa;
+      }
+      .card {
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(12, 12, 14, 0.6);
+        padding: 6px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+      }
+      .card-inner {
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: rgba(19, 19, 22, 0.4);
+        overflow: hidden;
+      }
+      .card-h {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .badge-repo {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: rgba(56, 189, 248, 0.1);
+        color: #e0f2fe;
+        box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+      }
+      .card-h h2 {
+        margin: 6px 0 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .path {
+        margin-top: 4px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: #71717a;
+      }
+      .pills {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .pill {
+        font-size: 11px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: rgba(7, 7, 8, 0.4);
+        color: #d4d4d8;
+      }
+      .pill strong {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+      .row-port {
+        display: grid;
+        grid-template-columns: 100px 1fr auto;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .row-port:last-child {
+        border-bottom: 0;
+      }
+      .row-port:hover {
+        background: rgba(255, 255, 255, 0.025);
+      }
+      .port-num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 16px;
+        font-weight: 600;
+        color: #7dd3fc;
+        text-align: center;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(7, 7, 8, 0.6);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        font-size: 11px;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+      .chip-f {
+        background: rgba(255, 255, 255, 0.06);
+        color: #e4e4e7;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+      .chip-c {
+        background: rgba(168, 85, 247, 0.12);
+        color: #ddd6fe;
+      }
+      .chip-h {
+        background: rgba(56, 189, 248, 0.1);
+        color: #bae6fd;
+        box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.22);
+      }
+      .meta-line {
+        margin-top: 6px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: #71717a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 6px 6px 6px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #f4f4f5;
+      }
+      .link-btn span {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: rgba(125, 211, 252, 0.9);
+      }
+      .link-btn .go {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        display: grid;
+        place-items: center;
+        color: #7dd3fc;
+        font-size: 11px;
+      }
+      .copy {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        margin-left: 4px;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 11px;
+        color: #71717a;
+        font-family: "JetBrains Mono", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="header">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Local dev radar</div>
+          <h1>PortPilot</h1>
+          <p class="lede">
+            Every port you’re actually using on this machine, grouped by project — host processes, Docker containers,
+            and Compose stacks in one premium view.
+          </p>
+        </div>
+        <div class="header-actions">
+          <div class="agent-pill">
+            <span class="status"><span class="sdot"></span> Online</span>
+            <span class="agent-host">127.0.0.1:7878</span>
+          </div>
+          <div class="btn-refresh">
+            Refresh scan
+            <span class="ico">↻</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-top"><span class="stat-label">Services</span><span style="color: #7dd3fc">◉</span></div>
+          <div><span class="stat-val">12</span><span class="stat-sub">5 stacks</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-top"><span class="stat-label">Projects</span><span style="color: #f0abfc">▦</span></div>
+          <div class="stat-val">4</div>
+        </div>
+        <div class="stat">
+          <div class="stat-top"><span class="stat-label">Docker</span><span style="color: #6ee7b7">▣</span></div>
+          <div class="stat-val">3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-top"><span class="stat-label">Host</span><span style="color: #fcd34d">⌘</span></div>
+          <div class="stat-val">9</div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="filters-inner">
+          <div class="row" style="margin-bottom: 16px">
+            <div class="field search">
+              <label>Search</label>
+              <input type="text" value="" placeholder="Port, label, command, container, URL…" readonly />
+            </div>
+            <div class="field">
+              <label>Source</label>
+              <div class="seg">
+                <button>All</button>
+                <button class="off">Host</button>
+                <button class="off">Docker</button>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Project</label>
+              <select><option>All projects</option></select>
+            </div>
+            <div class="field">
+              <label>Category</label>
+              <select><option>All categories</option></select>
+            </div>
+            <div class="field">
+              <label>Framework</label>
+              <select><option>All frameworks</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-h">
+            <div>
+              <span class="badge-repo">▦ Repo</span>
+              <h2>PortPilot</h2>
+              <div class="path">…/prj/PortPilot</div>
+            </div>
+            <div class="pills">
+              <span class="pill"><strong>2</strong> services</span>
+              <span class="pill" style="background: rgba(56, 189, 248, 0.1); color: #bae6fd; border-color: rgba(56, 189, 248, 0.2)">2 host</span>
+            </div>
+          </div>
+          <div class="row-port">
+            <div class="port-num">:5173</div>
+            <div>
+              <div class="chips">
+                <span class="chip chip-f">Vite</span>
+                <span class="chip chip-c">Frontend</span>
+                <span class="chip chip-h">host</span>
+                <span class="chip chip-f" style="font-family: 'JetBrains Mono', monospace; color: #a1a1aa">node</span>
+              </div>
+              <div class="meta-line">pid 88421 · vite --port 5173 · …/PortPilot/apps/dashboard</div>
+            </div>
+            <div style="display: flex; align-items: center">
+              <div class="link-btn"><span>localhost:5173</span><span class="go">↗</span></div>
+              <div class="copy"></div>
+            </div>
+          </div>
+          <div class="row-port">
+            <div class="port-num">:7878</div>
+            <div>
+              <div class="chips">
+                <span class="chip chip-f">Node.js</span>
+                <span class="chip chip-c">Backend</span>
+                <span class="chip chip-h">host</span>
+                <span class="chip chip-f" style="font-family: 'JetBrains Mono', monospace; color: #a1a1aa">node</span>
+              </div>
+              <div class="meta-line">pid 88102 · …/PortPilot/apps/agent</div>
+            </div>
+            <div style="display: flex; align-items: center">
+              <div class="link-btn"><span>127.0.0.1:7878</span><span class="go">↗</span></div>
+              <div class="copy"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-h">
+            <div>
+              <span class="badge-repo" style="background: rgba(16, 185, 129, 0.1); color: #a7f3d0; box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25)">▣ Compose</span>
+              <h2>web · postgres</h2>
+              <div class="path">…/compose/docker-compose.yml</div>
+            </div>
+            <div class="pills">
+              <span class="pill"><strong>2</strong> services</span>
+              <span class="pill" style="background: rgba(16, 185, 129, 0.1); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.2)">2 docker</span>
+            </div>
+          </div>
+          <div class="row-port">
+            <div class="port-num">:5432</div>
+            <div>
+              <div class="chips">
+                <span class="chip chip-f">PostgreSQL</span>
+                <span class="chip chip-c">Database</span>
+                <span class="chip" style="background: rgba(16, 185, 129, 0.1); color: #a7f3d0; box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.22)">docker</span>
+              </div>
+              <div class="meta-line">postgres:15 · …/data</div>
+            </div>
+            <div style="display: flex; align-items: center">
+              <div class="link-btn"><span>localhost:5432</span><span class="go">↗</span></div>
+              <div class="copy"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>scanned at <span style="color: #d4d4d8">02:14:08 PM</span></span>
+        <span>12 of 12 services shown</span>
+      </div>
+    </div>
+  </body>
+</html>

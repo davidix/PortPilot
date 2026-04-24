@@ -263,6 +263,36 @@
       footer a {
         font-weight: 500;
       }
+
+      .shots {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 0.5rem;
+      }
+
+      figure.shot {
+        margin: 0;
+      }
+
+      figure.shot figcaption {
+        margin-top: 0.6rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      figure.shot img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: var(--bg-elevated);
+      }
+
+      figure.shot--panel img {
+        max-width: 400px;
+      }
     </style>
   </head>
   <body>
@@ -282,6 +312,30 @@
           <a class="btn btn-ghost" href="#get-started">Get started</a>
         </div>
       </header>
+
+      <section aria-labelledby="shots-heading">
+        <h2 id="shots-heading">Interface</h2>
+        <div class="shots">
+          <figure class="shot">
+            <img
+              src="assets/dashboard.png"
+              width="1280"
+              height="860"
+              alt="PortPilot web dashboard showing stats, filters, and grouped port cards"
+            />
+            <figcaption>Web dashboard — stats, filters, grouped projects, and quick-open links.</figcaption>
+          </figure>
+          <figure class="shot shot--panel">
+            <img
+              src="assets/chrome-extension.png"
+              width="400"
+              height="780"
+              alt="PortPilot Chrome extension popup with search, source filter, and project groups"
+            />
+            <figcaption>Chrome extension — same scan, compact popup with search and open actions.</figcaption>
+          </figure>
+        </div>
+      </section>
 
       <section aria-labelledby="what-heading">
         <h2 id="what-heading">What it does</h2>

@@ -4,6 +4,14 @@
 
 Repository: [github.com/davidix/PortPilot](https://github.com/davidix/PortPilot)
 
+## Screenshots
+
+Static captures that match the current dashboard and extension styling (sample data).
+
+| Web dashboard | Chrome extension (MV3 popup) |
+| --- | --- |
+| ![PortPilot dashboard](docs/assets/dashboard.png) | ![PortPilot Chrome extension](docs/assets/chrome-extension.png) |
+
 ## What you get
 
 - **Agent** — Fastify HTTP API on `127.0.0.1:7878` (`/api/health`, `/api/scan`)

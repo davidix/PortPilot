@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PortPilot extension capture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink-950: #070708;
+        --line: rgba(255, 255, 255, 0.06);
+        --text: #e7e7ea;
+        --text-dim: #a1a1aa;
+        --text-mute: #71717a;
+        --sky: #7dd3fc;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        width: 380px;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        color: var(--text);
+        background: var(--ink-950);
+        background-image:
+          radial-gradient(420px 220px at 0% -10%, rgba(56, 189, 248, 0.16), transparent 60%),
+          radial-gradient(360px 200px at 100% -10%, rgba(99, 102, 241, 0.14), transparent 60%),
+          radial-gradient(420px 240px at 50% 110%, rgba(16, 185, 129, 0.07), transparent 60%);
+        -webkit-font-smoothing: antialiased;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .app {
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+        gap: 12px;
+      }
+      .brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(99, 102, 241, 0.85));
+        display: grid;
+        place-items: center;
+        color: #04101c;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 12px 28px -14px rgba(56, 189, 248, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      }
+      .brand-eyebrow {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--sky);
+      }
+      .brand-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: -0.015em;
+      }
+      .icon-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        display: grid;
+        place-items: center;
+        color: var(--text);
+        font-size: 13px;
+      }
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 10px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(12, 12, 14, 0.7);
+        font-size: 11px;
+      }
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        background: rgba(16, 185, 129, 0.12);
+        color: #a7f3d0;
+        box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.3);
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #34d399;
+      }
+      .status-host {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--text-dim);
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+      }
+      .stat {
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(12, 12, 14, 0.7);
+        padding: 8px 10px;
+        box-shadow: inset 0 -1px 0 rgba(56, 189, 248, 0.18);
+      }
+      .stat:nth-child(2) {
+        box-shadow: inset 0 -1px 0 rgba(232, 121, 249, 0.18);
+      }
+      .stat:nth-child(3) {
+        box-shadow: inset 0 -1px 0 rgba(16, 185, 129, 0.18);
+      }
+      .stat:nth-child(4) {
+        box-shadow: inset 0 -1px 0 rgba(252, 211, 77, 0.18);
+      }
+      .stat-label {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-mute);
+      }
+      .stat-value {
+        margin-top: 2px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+      .search {
+        position: relative;
+      }
+      .search svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        opacity: 0.5;
+      }
+      .search input {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(19, 19, 22, 0.8);
+        padding: 8px 12px 8px 32px;
+        font: inherit;
+        font-size: 12.5px;
+        color: var(--text);
+      }
+      .search input::placeholder {
+        color: var(--text-mute);
+      }
+      .segment {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+        padding: 3px;
+        border-radius: 12px;
+        background: rgba(19, 19, 22, 0.8);
+        border: 1px solid var(--line);
+      }
+      .segment button {
+        border: 0;
+        border-radius: 9px;
+        padding: 5px 8px;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.07);
+        color: #fff;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+      }
+      .segment button.off {
+        background: transparent;
+        color: var(--text-dim);
+        box-shadow: none;
+      }
+      .shell {
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(6, 6, 8, 0.55);
+        padding: 10px 8px 10px 10px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+      .shell-h {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 4px 8px 2px;
+      }
+      .shell-h span:first-child {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-mute);
+      }
+      .shell-h span:last-child {
+        font-size: 11px;
+        color: var(--text-dim);
+        font-variant-numeric: tabular-nums;
+      }
+      .group {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(12, 12, 14, 0.72);
+        overflow: hidden;
+        border-left: 3px solid rgba(56, 189, 248, 0.45);
+        margin-bottom: 8px;
+      }
+      .group-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.018);
+      }
+      .group-kind {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: rgba(56, 189, 248, 0.12);
+        color: #bae6fd;
+        box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.25);
+      }
+      .count-pill {
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--text-dim);
+      }
+      .count-pill .n {
+        color: #fff;
+        font-weight: 600;
+      }
+      .group-title {
+        display: block;
+        margin-top: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .chev {
+        color: var(--text-mute);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .tile {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.025);
+        background: rgba(255, 255, 255, 0.018);
+      }
+      .tile:last-child {
+        border-bottom: 0;
+      }
+      .port-chip {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--sky);
+        background: rgba(7, 7, 8, 0.7);
+        padding: 5px 8px;
+        border-radius: 8px;
+        min-width: 64px;
+        text-align: center;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .chip {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-weight: 500;
+      }
+      .tile-sub {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10.5px;
+        color: var(--text-mute);
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .btn-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 4px 4px 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text);
+      }
+      .btn-copy {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 4px;
+        border-top: 1px solid var(--line);
+        font-size: 10.5px;
+        color: var(--text-mute);
+        font-family: "JetBrains Mono", monospace;
+      }
+      .footer a {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-dim);
+        text-decoration: none;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.025);
+        font-family: Inter, sans-serif;
+        font-size: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="brand-mark">◇</div>
+          <div>
+            <div class="brand-eyebrow">Local dev radar</div>
+            <div class="brand-title">PortPilot</div>
+          </div>
+        </div>
+        <div class="icon-btn">↻</div>
+      </div>
+
+      <div class="status-row">
+        <span class="status-pill"><span class="dot"></span> Online</span>
+        <span class="status-host">127.0.0.1:7878</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Services</div><div class="stat-value">12</div></div>
+        <div class="stat"><div class="stat-label">Projects</div><div class="stat-value">4</div></div>
+        <div class="stat"><div class="stat-label">Docker</div><div class="stat-value">3</div></div>
+        <div class="stat"><div class="stat-label">Host</div><div class="stat-value">9</div></div>
+      </div>
+
+      <div>
+        <div class="search">
+          <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #71717a">⌕</span>
+          <input type="text" placeholder="Search port, project, image…" readonly />
+        </div>
+      </div>
+
+      <div class="segment">
+        <button>All</button>
+        <button class="off">Host</button>
+        <button class="off">Docker</button>
+      </div>
+
+      <div class="shell">
+        <div class="shell-h">
+          <span>Projects</span>
+          <span>2 groups · 3 services</span>
+        </div>
+        <div class="group">
+          <div class="group-head">
+            <div style="flex: 1; min-width: 0">
+              <div style="display: flex; justify-content: space-between; align-items: center">
+                <span class="group-kind">▦ Repo</span>
+                <span class="count-pill"><span class="n">2</span> services</span>
+              </div>
+              <span class="group-title">PortPilot</span>
+            </div>
+            <span class="chev">⌄</span>
+          </div>
+          <div class="tile">
+            <span class="port-chip">:5173</span>
+            <div>
+              <div class="chips">
+                <span class="chip" style="background: rgba(255,255,255,0.04); color: #e4e4e7">Vite</span>
+                <span class="chip" style="background: rgba(168,85,247,0.08); color: #ddd6fe">Frontend</span>
+                <span class="chip" style="background: rgba(56,189,248,0.1); color: #bae6fd">host</span>
+              </div>
+              <div class="tile-sub">node · …/apps/dashboard</div>
+            </div>
+            <div style="display: flex; gap: 4px">
+              <div class="btn-open">Open <span style="font-size: 10px">↗</span></div>
+              <div class="btn-copy"></div>
+            </div>
+          </div>
+          <div class="tile">
+            <span class="port-chip">:7878</span>
+            <div>
+              <div class="chips">
+                <span class="chip" style="background: rgba(255,255,255,0.04); color: #e4e4e7">Node.js</span>
+                <span class="chip" style="background: rgba(168,85,247,0.08); color: #ddd6fe">Backend</span>
+                <span class="chip" style="background: rgba(56,189,248,0.1); color: #bae6fd">host</span>
+              </div>
+              <div class="tile-sub">node · …/apps/agent</div>
+            </div>
+            <div style="display: flex; gap: 4px">
+              <div class="btn-open">Open <span style="font-size: 10px">↗</span></div>
+              <div class="btn-copy"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>scanned 02:14 PM · 3/12</span>
+        <a href="#">Open dashboard ↗</a>
+      </div>
+    </div>
+  </body>
+</html>
