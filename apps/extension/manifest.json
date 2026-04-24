@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "PortPilot",
+  "description": "Quick view of local dev services via the PortPilot agent.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "PortPilot",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["alarms", "storage"],
+  "host_permissions": ["http://127.0.0.1:7878/*", "http://localhost:7878/*"]
+}
