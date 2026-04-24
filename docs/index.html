@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PortPilot — local port dashboard for developers</title>
+    <meta
+      name="description"
+      content="Scan TCP listeners and Docker-published ports on your machine. Web dashboard, Chrome extension, and a loopback Fastify API."
+    />
+    <meta property="og:title" content="PortPilot" />
+    <meta
+      property="og:description"
+      content="Local port dashboard for developers — agent, dashboard, and Chrome extension."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0c0f14;
+        --bg-elevated: #121722;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #e8ecf1;
+        --muted: #8b96a8;
+        --accent: #3dd6c3;
+        --accent-dim: rgba(61, 214, 195, 0.15);
+        --warn: #f0c674;
+        --radius: 12px;
+        --font-sans: "Outfit", system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: var(--text);
+        background: var(--bg);
+        background-image:
+          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(61, 214, 195, 0.12), transparent),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 100% 100%, 100% 24px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .wrap {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+
+      header {
+        margin-bottom: 3rem;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: var(--accent-dim);
+        border: 1px solid rgba(61, 214, 195, 0.35);
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        margin-bottom: 1.25rem;
+      }
+
+      .badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+      }
+
+      h1 {
+        font-size: clamp(2.25rem, 5vw, 3.25rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin: 0 0 1rem;
+      }
+
+      .lede {
+        font-size: 1.2rem;
+        color: var(--muted);
+        max-width: 36ch;
+        margin: 0;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: var(--font-sans);
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.65rem 1.25rem;
+        border-radius: var(--radius);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #041210;
+        border-color: var(--accent);
+      }
+
+      .btn-primary:hover {
+        filter: brightness(1.05);
+      }
+
+      .btn-ghost {
+        background: var(--bg-elevated);
+        color: var(--text);
+        border-color: var(--border);
+      }
+
+      .btn-ghost:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+
+      section {
+        margin-top: 3rem;
+      }
+
+      h2 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin: 0 0 1rem;
+      }
+
+      .features {
+        display: grid;
+        gap: 1rem;
+      }
+
+      @media (min-width: 560px) {
+        .features {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.35rem;
+      }
+
+      .card h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .card p {
+        margin: 0;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      .mono-block {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.55;
+        background: #080a0e;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.1rem 1.25rem;
+        overflow-x: auto;
+        color: #c5cdd8;
+      }
+
+      .mono-block .comment {
+        color: #5c6575;
+      }
+
+      .mono-block .cmd {
+        color: var(--accent);
+      }
+
+      .stack-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .stack-list li {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      .stack-list li span:first-child {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--warn);
+        min-width: 7rem;
+      }
+
+      footer {
+        margin-top: 3.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      footer a {
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <p class="badge">Open source · MIT</p>
+        <h1>PortPilot</h1>
+        <p class="lede">
+          A local port dashboard for developers: see what is listening on your machine and open services in one click.
+        </p>
+        <div class="cta-row">
+          <a
+            class="btn btn-primary"
+            href="https://github.com/davidix/PortPilot"
+            rel="noopener noreferrer"
+          >View on GitHub</a>
+          <a class="btn btn-ghost" href="#get-started">Get started</a>
+        </div>
+      </header>
+
+      <section aria-labelledby="what-heading">
+        <h2 id="what-heading">What it does</h2>
+        <div class="features">
+          <article class="card">
+            <h3>TCP listeners</h3>
+            <p>
+              Uses <code style="font-family: var(--font-mono); font-size: 0.85em">lsof</code> on macOS and Linux to list
+              processes bound to ports—no guessing which dev server grabbed 3000.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Docker ports</h3>
+            <p>
+              Reads published container ports via <code style="font-family: var(--font-mono); font-size: 0.85em">docker inspect</code>
+              when Docker is available; skipped cleanly if the daemon is not running.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Grouped UI</h3>
+            <p>
+              Ports and services are classified and grouped with quick-open links so you can jump from overview to browser.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Your workflow</h3>
+            <p>
+              Use the <strong style="color: var(--text)">Vite + React</strong> dashboard, the
+              <strong style="color: var(--text)">Chrome MV3</strong> extension, or both against the same loopback API.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="arch-heading">
+        <h2 id="arch-heading">Monorepo layout</h2>
+        <ul class="stack-list">
+          <li><span>apps/agent</span> Fastify HTTP API on <code style="font-family: var(--font-mono)">127.0.0.1:7878</code></li>
+          <li><span>apps/dashboard</span> Vite + React + Tailwind UI</li>
+          <li><span>apps/extension</span> Chrome extension (popup + service worker)</li>
+          <li><span>packages/shared</span> TypeScript types and port helpers</li>
+        </ul>
+      </section>
+
+      <section id="get-started" aria-labelledby="start-heading">
+        <h2 id="start-heading">Get started</h2>
+        <p style="color: var(--muted); margin: 0 0 1rem">
+          Requires Node.js 18+, pnpm 9, and macOS or Linux with <code style="font-family: var(--font-mono); font-size: 0.9em">lsof</code>.
+        </p>
+        <pre class="mono-block" role="region" aria-label="Install commands"><span class="comment"># clone &amp; install</span>
+git clone https://github.com/davidix/PortPilot.git
+cd PortPilot
+<span class="cmd">pnpm install</span>
+<span class="cmd">pnpm run build:shared</span>
+
+<span class="comment"># terminal 1 — API</span>
+<span class="cmd">pnpm run dev:agent</span>
+
+<span class="comment"># terminal 2 — dashboard (e.g. http://localhost:5173)</span>
+<span class="cmd">pnpm run dev:dashboard</span></pre>
+        <p style="margin-top: 1rem; font-size: 0.95rem; color: var(--muted)">
+          Extension: build with <code style="font-family: var(--font-mono); font-size: 0.85em">pnpm run build --filter @portpilot/extension</code>,
+          then load unpacked from <code style="font-family: var(--font-mono); font-size: 0.85em">apps/extension/dist</code>.
+        </p>
+      </section>
+
+      <section aria-labelledby="safety-heading">
+        <h2 id="safety-heading">Safety</h2>
+        <p style="color: var(--muted); margin: 0">
+          The agent binds to loopback only, does not require <code style="font-family: var(--font-mono); font-size: 0.9em">sudo</code>,
+          and optional process kill is off by default. See the repository README for CORS, env vars, and API details.
+        </p>
+      </section>
+
+      <footer>
+        <p style="margin: 0">
+          <a href="https://github.com/davidix/PortPilot" rel="noopener noreferrer">github.com/davidix/PortPilot</a>
+          — MIT License
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
